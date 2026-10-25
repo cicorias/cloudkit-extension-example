@@ -39,3 +39,4 @@ coverage/
 
 # Claude Code: shared settings are committed, personal ones are not
 .claude/settings.local.json
+resume.sh
