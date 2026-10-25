@@ -1,0 +1,9 @@
+body { background: var(--bg-subtle); }
+.page { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 16px; }
+.card { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.form { display: grid; gap: 12px; }
+.form label { display: grid; gap: 4px; }
+.form label.check { display: flex; gap: 8px; align-items: center; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 0; }
+.kv dt { color: var(--fg-muted); }
+.kv dd { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; overflow-wrap: anywhere; }

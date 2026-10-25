@@ -1,0 +1,37 @@
+# gitleaks config: default rules plus project-specific ones.
+title = "cloudkit-extension-example"
+
+[extend]
+useDefault = true
+
+# CloudKit API / web-auth tokens are long hex/base64 strings in query params or
+# env assignments. Flag any non-empty assignment in committed files.
+[[rules]]
+id = "cloudkit-api-token-assignment"
+description = "CloudKit API token assigned in a file"
+regex = '''(?i)CLOUDKIT_API_TOKEN\s*[=:]\s*["']?([A-Za-z0-9+/=_\-]{16,})'''
+secretGroup = 1
+
+[[rules]]
+id = "cloudkit-web-auth-token"
+description = "CloudKit web auth token (ckWebAuthToken) literal"
+regex = '''ckWebAuthToken=([A-Za-z0-9%+/=_\-]{24,})'''
+secretGroup = 1
+
+[[rules]]
+id = "extension-private-key"
+description = "PEM private key"
+regex = '''-----BEGIN (RSA )?PRIVATE KEY-----'''
+
+[allowlist]
+description = "Build output, deps and test fixtures"
+paths = [
+  '''(^|/)node_modules/''',
+  '''(^|/)dist/''',
+  '''(^|/)artifacts/''',
+  '''(^|/)pnpm-lock\.yaml$''',
+]
+# Obvious placeholders used in docs/tests.
+regexes = [
+  '''(?i)(test|fake|example|placeholder|xxxx)[-_a-z0-9]*''',
+]

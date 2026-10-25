@@ -1,0 +1,41 @@
+# --- Secrets & local config (NEVER commit) ---
+.env
+.env.*
+!.env.example
+.envrc
+mise.local.toml
+.mise.local.toml
+.keys/
+*.pem
+*.p8
+*.p12
+*.key
+*.crx
+
+# --- Build output ---
+dist/
+artifacts/
+*.zip
+*.tsbuildinfo
+
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+
+# --- Python (if/when used via uv) ---
+.venv/
+__pycache__/
+*.pyc
+
+# --- Tooling / OS ---
+.direnv/
+.vite/
+coverage/
+.DS_Store
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code: shared settings are committed, personal ones are not
+.claude/settings.local.json

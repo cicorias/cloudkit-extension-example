@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Installed by `mise run setup` (git config core.hooksPath .githooks).
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+
+# Refuse to commit local-only files even if someone force-adds them.
+blocked="$(git diff --cached --name-only | grep -E '(^|/)(\.env(\..+)?|\.envrc|mise\.local\.toml|\.keys/.*|.*\.pem|.*\.p8)$' | grep -v -E '(^|/)\.env\.example$' || true)"
+if [[ -n "$blocked" ]]; then
+  echo "pre-commit: refusing to commit local/secret files:" >&2
+  echo "$blocked" | sed 's/^/  /' >&2
+  exit 1
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  "$root/scripts/secrets-scan.sh" --staged
+else
+  echo "pre-commit: gitleaks not installed (mise install); skipping secret scan" >&2
+fi

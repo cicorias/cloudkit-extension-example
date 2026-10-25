@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CloudKit TODO: Settings</title>
+  </head>
+  <body>
+    <main class="page">
+      <h1>CloudKit TODO settings</h1>
+
+      <section class="card">
+        <h2>Account</h2>
+        <p id="account" class="muted">Checking…</p>
+        <div class="row">
+          <button id="sign-in" class="primary" type="button" hidden>Sign in with Apple</button>
+          <button id="sign-out" type="button" hidden>Sign out</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Synced settings <span class="muted small">(stored in your iCloud private database)</span></h2>
+        <p class="muted small">These follow you to every browser where you sign in with the same Apple ID.</p>
+        <form id="synced-form" class="form">
+          <label>Default priority for new TODOs
+            <select name="defaultPriority">
+              <option value="0">None</option><option value="1">Low</option>
+              <option value="2">Medium</option><option value="3">High</option>
+            </select>
+          </label>
+          <label>Sort by
+            <select name="sortBy">
+              <option value="created">Newest first</option>
+              <option value="priority">Priority</option>
+              <option value="dueDate">Due date</option>
+              <option value="title">Title</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" name="showCompleted" /> Show completed TODOs in the popup</label>
+          <div class="row"><button class="primary" type="submit">Save to iCloud</button></div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>This browser <span class="muted small">(stored in chrome.storage.local)</span></h2>
+        <form id="device-form" class="form">
+          <label>Theme
+            <select name="theme">
+              <option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" name="actionOpensSidePanel" /> Toolbar button opens the side panel instead of the popup</label>
+          <label class="check"><input type="checkbox" name="confirmBulkDelete" /> Confirm before bulk delete</label>
+        </form>
+        <p id="device-saved" class="muted small" hidden>Saved.</p>
+      </section>
+
+      <section class="card">
+        <h2>Developer info</h2>
+        <dl id="dev-info" class="kv"></dl>
+        <p class="muted small">Set the API token's <b>Sign In Callback</b> in CloudKit Console to the redirect URL above
+          (see <code>docs/apple-developer-setup.md</code>).</p>
+      </section>
+
+      <div id="status" class="status" hidden></div>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+# direnv template. Copy to .envrc (gitignored) and run `direnv allow`:
+#   cp .envrc.example .envrc && direnv allow
+# `mise run setup` does the copy for you if .envrc does not exist.
+#
+# Keep values in .env.local, not here, so scripts and Vite see the same config.
+dotenv_if_exists .env.local
+
+# Make mise-managed tools (node, pnpm, gitleaks) available on PATH.
+if has mise; then
+  eval "$(mise env -s bash)"
+fi

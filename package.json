@@ -1,0 +1,22 @@
+{
+  "name": "cloudkit-extension-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Example Chrome/Edge MV3 extension: a TODO list stored in the user's CloudKit private database, with Apple sign-in.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.8.0",
+  "scripts": {
+    "build": "tsc --noEmit && vite build --mode production",
+    "dev": "vite build --mode development --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.6",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}

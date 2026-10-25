@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CloudKit TODO: Bulk edit</title>
+  </head>
+  <body>
+    <header class="bar">
+      <h1 class="grow">Bulk edit</h1>
+      <span id="who" class="muted small"></span>
+      <button id="sign-in" class="primary" hidden>Sign in with Apple</button>
+      <button id="reload" type="button" title="Reload from iCloud">⟳</button>
+    </header>
+
+    <div id="config-missing" class="notice" hidden></div>
+    <div id="signed-out" class="notice" hidden>Sign in with your Apple ID to load TODOs from your iCloud private database.</div>
+
+    <main id="main" hidden>
+      <section class="filters row">
+        <input id="search" class="grow" type="search" placeholder="Filter by text or #tag" />
+        <select id="status-filter" title="Status">
+          <option value="all">All</option>
+          <option value="open">Open</option>
+          <option value="done">Done</option>
+        </select>
+      </section>
+
+      <section class="bulk-bar" aria-label="Bulk actions">
+        <div class="row">
+          <label class="row small"><input id="select-all" type="checkbox" /> <span id="sel-count">0 selected</span></label>
+        </div>
+        <div class="row wrap">
+          <button data-action="done" type="button">Mark done</button>
+          <button data-action="open" type="button">Mark open</button>
+          <select id="bulk-priority" title="Set priority">
+            <option value="">Priority…</option>
+            <option value="0">None</option>
+            <option value="1">Low</option>
+            <option value="2">Medium</option>
+            <option value="3">High</option>
+          </select>
+          <input id="bulk-due" type="date" title="Set due date" />
+          <button data-action="clear-due" type="button">Clear due</button>
+        </div>
+        <div class="row wrap">
+          <input id="bulk-tag" type="text" placeholder="tag" size="10" />
+          <button data-action="add-tag" type="button">+ Tag</button>
+          <button data-action="remove-tag" type="button">− Tag</button>
+          <span class="grow"></span>
+          <button data-action="delete" class="danger" type="button">Delete</button>
+        </div>
+      </section>
+
+      <ul id="list" class="grid"></ul>
+      <p id="empty" class="muted pad" hidden>No TODOs match.</p>
+
+      <details class="pad">
+        <summary>Bulk add</summary>
+        <p class="muted small">One TODO per line. Supports <code>#tag</code>, <code>!low|!med|!high</code>, <code>due:YYYY-MM-DD</code>.</p>
+        <textarea id="bulk-add" rows="6" placeholder="Book flights #travel !high&#10;Renew passport due:2026-12-01"></textarea>
+        <div class="row"><button id="bulk-add-btn" class="primary" type="button">Add all</button></div>
+      </details>
+
+      <details class="pad">
+        <summary>Import / export</summary>
+        <div class="row wrap">
+          <button id="export" type="button">Export JSON</button>
+          <label class="button-like">Import JSON <input id="import" type="file" accept="application/json" hidden /></label>
+        </div>
+      </details>
+    </main>
+
+    <div id="status" class="status" hidden></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

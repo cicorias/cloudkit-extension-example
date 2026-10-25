@@ -1,0 +1,82 @@
+# Toolchain + task runner. Every task delegates to a script in ./scripts so the
+# logic is reviewable and runnable without mise.  List tasks: `mise tasks`
+#
+# Local env vars: .env.local (see .env.example) is loaded by each script.
+# You may instead put them under [env] in mise.local.toml (gitignored).
+
+[tools]
+node = "24"
+pnpm = "11"
+gitleaks = "8"
+# uv = "latest"   # only if Python tooling is added (see ADR-0010)
+
+[settings]
+experimental = false
+
+[tasks.setup]
+description = "First-time setup: install deps, create .env.local/.envrc from templates, install git hooks"
+run = "scripts/setup.sh"
+
+[tasks.doctor]
+description = "Check toolchain and local configuration (never prints secret values)"
+run = "scripts/doctor.sh"
+
+[tasks.dev]
+description = "Build the extension to dist/ and rebuild on change"
+run = "scripts/dev.sh"
+
+[tasks.build]
+description = "Production build of the extension into dist/"
+run = "scripts/build.sh"
+
+[tasks.test]
+description = "Run unit tests (vitest)"
+run = "scripts/test.sh"
+
+[tasks.check]
+description = "Typecheck, test and scan for secrets"
+run = "scripts/check.sh"
+
+[tasks.package]
+description = "Build and zip dist/ into artifacts/ for store upload"
+run = "scripts/package.sh"
+
+[tasks.icons]
+description = "Regenerate PNG icons in public/icons"
+run = "scripts/gen-icons.sh"
+
+[tasks."ext:key"]
+description = "Generate the extension signing key (pins the extension ID) and record the public key in .env.local"
+run = "scripts/ext-key.sh"
+
+[tasks."ext:info"]
+description = "Print extension ID and the Sign In Callback URL to configure in CloudKit"
+run = "scripts/ext-info.sh"
+
+[tasks."ck:token"]
+description = "Save a CloudKit management token into the macOS keychain for cktool"
+run = "scripts/ck-token.sh"
+
+[tasks."ck:validate"]
+description = "Validate cloudkit/schema.ckdb against the container"
+run = "scripts/ck-schema.sh validate"
+
+[tasks."ck:import"]
+description = "Import cloudkit/schema.ckdb into the development environment"
+run = "scripts/ck-schema.sh import"
+
+[tasks."ck:export"]
+description = "Export the container's development schema to cloudkit/schema.exported.ckdb"
+run = "scripts/ck-schema.sh export"
+
+[tasks."ck:reset"]
+description = "Reset the development schema and data to production (destructive, asks first)"
+run = "scripts/ck-schema.sh reset"
+
+[tasks."secrets:scan"]
+description = "Scan the working tree and git history for secrets with gitleaks"
+run = "scripts/secrets-scan.sh"
+
+[tasks."ck:teams"]
+description = "List Apple Developer teams your management token can access (find APPLE_TEAM_ID)"
+run = "xcrun cktool get-teams"
