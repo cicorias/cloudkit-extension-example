@@ -1,6 +1,6 @@
 # ADR-0010: mise as toolchain and task runner; logic in ./scripts; uv for any Python
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0011](0011-scripts-in-typescript-on-node.md)
 - **Date:** 2026-10-25
 
 ## Context

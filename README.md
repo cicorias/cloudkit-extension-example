@@ -12,7 +12,7 @@ It's meant as a starting point you can copy. It shows how to:
 - call CloudKit Web Services directly from MV3 (no remote code)
 - read and write records in the **private** database, including **bulk** edits in a side panel
 - keep **synced settings** in CloudKit and **per-browser settings** in `chrome.storage`
-- manage the CloudKit **schema as code** with `cktool`
+- manage the CloudKit **schema as code** with Apple's CKTool JS (from Linux, macOS or Windows; no Xcode needed)
 - keep a public repo free of secrets (env files, a pre-commit hook, gitleaks in CI)
 
 ## Features
@@ -26,8 +26,9 @@ It's meant as a starting point you can copy. It shows how to:
 
 ## Quick start
 
-Prerequisites: a paid Apple Developer account, macOS with Xcode (for `cktool`), and
-[mise](https://mise.jdx.dev). [direnv](https://direnv.net) is optional.
+Prerequisites: a paid Apple Developer account and [mise](https://mise.jdx.dev).
+[direnv](https://direnv.net) is optional. Everything, including schema validation and import,
+runs on Linux, macOS, Windows or WSL. You don't need a Mac or Xcode.
 
 ```sh
 git clone https://github.com/cicorias/cloudkit-extension-example.git
@@ -41,7 +42,7 @@ Then follow **[docs/apple-developer-setup.md](docs/apple-developer-setup.md)** t
 iCloud container and tokens, and fill in `.env.local`. After that:
 
 ```sh
-mise run ck:token     # store a CloudKit management token in the keychain (once)
+mise run ck:token     # save a CloudKit management token in .env.local (once)
 mise run ck:import    # create the schema in the development environment
 mise run doctor       # confirm everything is configured
 mise run build        # or: mise run dev  (watch mode)
@@ -65,12 +66,13 @@ documents each key. They're loaded by:
 | `CLOUDKIT_ENVIRONMENT` | yes | `development` / `production` |
 | `CLOUDKIT_API_TOKEN` | yes | A client token, so it's visible in the built extension; the private DB still needs the user's sign-in |
 | `EXTENSION_PUBLIC_KEY` | as manifest `key` | Public. The private key stays in `.keys/` |
-| `APPLE_TEAM_ID` | no | Used by cktool only |
-| management token | no | Kept in the macOS keychain by `cktool save-token` |
+| `APPLE_TEAM_ID` | no | Used by the `ck:*` schema tasks only |
+| `CLOUDKIT_MANAGEMENT_TOKEN` | no | **Secret.** Used by `ck:*` only. Set with `mise run ck:token`, or export it from `.envrc` |
 
 ## Tasks
 
-`mise tasks` lists them all. Each one runs a script in [`scripts/`](scripts).
+`mise tasks` lists them all. Each one runs a TypeScript script in [`scripts/`](scripts) that Node
+executes directly, so `node scripts/<name>.ts` works without mise too.
 
 | Task | Purpose |
 |---|---|
@@ -78,7 +80,7 @@ documents each key. They're loaded by:
 | `dev` / `build` / `package` | Watch build / production build / zip for the stores |
 | `test` / `check` | Unit tests / typecheck, tests, build and secret scan (what CI runs) |
 | `ext:key` / `ext:info` | Generate the signing key / show the extension ID and callback URL |
-| `ck:token` / `ck:teams` | Save the cktool management token / list teams |
+| `ck:token` / `ck:teams` | Save the management token to `.env.local` / list your teams |
 | `ck:validate` / `ck:import` / `ck:export` / `ck:reset` | Schema as code against development |
 | `secrets:scan` / `icons` | gitleaks scan / regenerate icons |
 

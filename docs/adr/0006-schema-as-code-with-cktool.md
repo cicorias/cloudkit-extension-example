@@ -1,6 +1,6 @@
 # ADR-0006: Schema as code with cktool
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0012](0012-cktool-js-for-schema-automation.md)
 - **Date:** 2026-10-25
 
 ## Context
