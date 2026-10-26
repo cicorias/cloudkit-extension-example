@@ -1,5 +1,7 @@
-# Toolchain + task runner. Every task delegates to a script in ./scripts so the
-# logic is reviewable and runnable without mise.  List tasks: `mise tasks`
+# Toolchain + task runner. Every task delegates to a TypeScript script in ./scripts,
+# which Node runs directly (no build step), so the logic is reviewable, typechecked and
+# runnable without mise: `node scripts/<name>.ts`. Works on Linux, macOS and Windows; no
+# Xcode needed (schema tasks use Apple's CKTool JS, see ADR-0012).  List tasks: `mise tasks`
 #
 # Local env vars: .env.local (see .env.example) is loaded by each script.
 # You may instead put them under [env] in mise.local.toml (gitignored).
@@ -8,75 +10,75 @@
 node = "24"
 pnpm = "11"
 gitleaks = "8"
-# uv = "latest"   # only if Python tooling is added (see ADR-0010)
+# uv = "latest"   # only if Python tooling is added (see ADR-0011)
 
 [settings]
 experimental = false
 
 [tasks.setup]
 description = "First-time setup: install deps, create .env.local/.envrc from templates, install git hooks"
-run = "scripts/setup.sh"
+run = "node scripts/setup.ts"
 
 [tasks.doctor]
 description = "Check toolchain and local configuration (never prints secret values)"
-run = "scripts/doctor.sh"
+run = "node scripts/doctor.ts"
 
 [tasks.dev]
 description = "Build the extension to dist/ and rebuild on change"
-run = "scripts/dev.sh"
+run = "node scripts/dev.ts"
 
 [tasks.build]
 description = "Production build of the extension into dist/"
-run = "scripts/build.sh"
+run = "node scripts/build.ts"
 
 [tasks.test]
 description = "Run unit tests (vitest)"
-run = "scripts/test.sh"
+run = "node scripts/test.ts"
 
 [tasks.check]
-description = "Typecheck, test and scan for secrets"
-run = "scripts/check.sh"
+description = "Typecheck (extension + scripts), test, build and scan for secrets"
+run = "node scripts/check.ts"
 
 [tasks.package]
 description = "Build and zip dist/ into artifacts/ for store upload"
-run = "scripts/package.sh"
+run = "node scripts/package.ts"
 
 [tasks.icons]
 description = "Regenerate PNG icons in public/icons"
-run = "scripts/gen-icons.sh"
+run = "node scripts/gen-icons.ts"
 
 [tasks."ext:key"]
 description = "Generate the extension signing key (pins the extension ID) and record the public key in .env.local"
-run = "scripts/ext-key.sh"
+run = "node scripts/ext-key.ts"
 
 [tasks."ext:info"]
 description = "Print extension ID and the Sign In Callback URL to configure in CloudKit"
-run = "scripts/ext-info.sh"
+run = "node scripts/ext-info.ts"
 
 [tasks."ck:token"]
-description = "Save a CloudKit management token into the macOS keychain for cktool"
-run = "scripts/ck-token.sh"
+description = "Save the CloudKit management token (hidden prompt) as CLOUDKIT_MANAGEMENT_TOKEN in .env.local"
+run = "node scripts/ck.ts token"
 
 [tasks."ck:validate"]
 description = "Validate cloudkit/schema.ckdb against the container"
-run = "scripts/ck-schema.sh validate"
+run = "node scripts/ck.ts validate"
 
 [tasks."ck:import"]
 description = "Import cloudkit/schema.ckdb into the development environment"
-run = "scripts/ck-schema.sh import"
+run = "node scripts/ck.ts import"
 
 [tasks."ck:export"]
 description = "Export the container's development schema to cloudkit/schema.exported.ckdb"
-run = "scripts/ck-schema.sh export"
+run = "node scripts/ck.ts export"
 
 [tasks."ck:reset"]
 description = "Reset the development schema and data to production (destructive, asks first)"
-run = "scripts/ck-schema.sh reset"
+run = "node scripts/ck.ts reset"
 
 [tasks."secrets:scan"]
 description = "Scan the working tree and git history for secrets with gitleaks"
-run = "scripts/secrets-scan.sh"
+run = "node scripts/secrets-scan.ts"
 
 [tasks."ck:teams"]
 description = "List Apple Developer teams your management token can access (find APPLE_TEAM_ID)"
-run = "xcrun cktool get-teams"
+run = "node scripts/ck.ts teams"

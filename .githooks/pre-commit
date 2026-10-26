@@ -12,7 +12,7 @@ if [[ -n "$blocked" ]]; then
 fi
 
 if command -v gitleaks >/dev/null 2>&1; then
-  "$root/scripts/secrets-scan.sh" --staged
+  node "$root/scripts/secrets-scan.ts" --staged
 else
   echo "pre-commit: gitleaks not installed (mise install); skipping secret scan" >&2
 fi

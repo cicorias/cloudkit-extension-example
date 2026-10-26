@@ -14,7 +14,7 @@ private database. Allow about 20 minutes.
 | Team ID | Developer portal | `.env.local` → `APPLE_TEAM_ID` | No (but keep it local) |
 | Extension signing key | `mise run ext:key` | `.keys/extension-key.pem` (private) and `.env.local` → `EXTENSION_PUBLIC_KEY` | **Private key: yes** |
 | CloudKit **API token** | CloudKit Console | `.env.local` → `CLOUDKIT_API_TOKEN` | Semi. It ships inside the extension, so don't commit it. |
-| CloudKit **management token** | CloudKit Console | macOS keychain, via `mise run ck:token` | **Yes** |
+| CloudKit **management token** | CloudKit Console | `.env.local` → `CLOUDKIT_MANAGEMENT_TOKEN` (via `mise run ck:token`) or your `.envrc` | **Yes** |
 
 None of these values belong in git. `.env.local`, `.envrc`, `mise.local.toml` and `.keys/` are
 all gitignored, and the pre-commit hook rejects them along with anything gitleaks flags.
@@ -24,7 +24,8 @@ all gitignored, and the pre-commit hook rejects them along with anything gitleak
 ## 0. Prerequisites
 
 - A paid **Apple Developer Program** membership. CloudKit isn't available on a free account.
-- macOS with **Xcode 13 or later**, which provides `xcrun cktool` for schema automation.
+- Linux, macOS, Windows or WSL. Schema automation uses Apple's **CKTool JS** npm packages, which
+  `mise run setup` installs, so you don't need Xcode.
 - `mise`, plus optionally `direnv`. Run `mise install && mise run setup`.
 - Chrome 116+ or Edge 116+.
 
@@ -78,17 +79,21 @@ Copy the **Sign In Callback** URL for step 5. You can print it again at any time
 `mise run ext:info`. Teammates who need the same ID should get the `.pem` through a password
 manager, never through git.
 
-## 4. Management token for cktool (schema automation)
+## 4. Management token (schema automation)
 
 1. Open CloudKit Console at <https://icloud.developer.apple.com/>.
 2. From the account menu (top right), open **Settings**, then **Tokens**, then **Management Tokens**, and click **+**.
 3. Name the token (for example "cktool – laptop") and copy its value.
-4. Run the following and paste the value when prompted. cktool stores it in your keychain, so it never touches a file:
+4. Run the following and paste the value when prompted. The input is hidden. The token is written
+   to `.env.local` as `CLOUDKIT_MANAGEMENT_TOKEN` (gitignored, mode 600):
 
    ```sh
    mise run ck:token
-   mise run ck:teams      # sanity check: lists your team(s)
+   mise run ck:teams      # sanity check: lists your team(s) and their IDs
    ```
+
+   If you use direnv, you can `export CLOUDKIT_MANAGEMENT_TOKEN=…` in your gitignored `.envrc`
+   instead. If the token isn't set anywhere, each `ck:*` task prompts for it.
 
 ## 5. API token (what the extension uses)
 
@@ -174,5 +179,5 @@ project doesn't use it. See [ADR-0004](adr/0004-apple-sign-in-via-launchwebauthf
 | `BAD_REQUEST … not marked queryable` | The schema wasn't imported into this environment. Run `mise run ck:import`. |
 | Sign-in loop / 421 on every call | The token was revoked or expired, or it came from the other environment (dev vs prod). Sign out, then sign in again. |
 | `AUTHENTICATION_FAILED` | Wrong `CLOUDKIT_API_TOKEN` for this container or environment. |
-| `cktool: … not authorized` | No management token in the keychain, or the token belongs to another team. Run `mise run ck:token`. |
+| `CloudKit 401: invalid-or-expired-session` from a `ck:*` task | `CLOUDKIT_MANAGEMENT_TOKEN` is missing, revoked or expired, or belongs to another team than `APPLE_TEAM_ID`. Run `mise run ck:token`. |
 | Popup closes during sign-in | Expected. Sign-in runs in the service worker, so reopen the popup afterwards. |

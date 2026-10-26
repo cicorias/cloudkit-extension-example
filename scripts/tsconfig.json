@@ -1,0 +1,14 @@
+{
+  // Typechecks scripts/ as Node ESM. Node runs these files directly (type stripping), so
+  // only erasable TypeScript syntax is allowed: no enums, namespaces or parameter properties.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2024"],
+    "types": ["node"],
+    "erasableSyntaxOnly": true
+  },
+  "include": ["."]
+}

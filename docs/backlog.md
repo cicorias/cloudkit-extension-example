@@ -17,10 +17,9 @@ _(none)_
 | B-001 | 🧪 End-to-end check against a real container (Chrome **and** Edge) | Follow docs/apple-developer-setup.md. Record any portal label drift in the doc. |
 | B-002 | 🧪 Verify `ckWebAuthToken` lifetime/rotation | Does CloudKit return a refreshed token on responses? If so, persist it in `CloudKitClient.request`. |
 | B-003 | 🧪 Verify that sending `{value: null}` clears `dueDate` in an `update` | Otherwise switch "clear due" to a `replace` or a separate field strategy. |
-| B-004 | 🧪 Run `ck:validate` against a real container and fix any `.ckdb` grammar issues | The schema was hand-written to match exported-schema format. |
+| B-004 | 🧪 Run `ck:validate` against a real container and fix any `.ckdb` grammar issues | The schema was hand-written to match exported-schema format. Now runs via CKTool JS, so try it from Linux too. |
 | B-005 | ✨ Edit notes and due date per item in the side panel | Inline expand row. |
 | B-006 | 🔧 Lint/format (Biome) + `mise run lint`, in CI | |
-| B-007 | 🔧 shellcheck for `scripts/` in CI | |
 
 ## Later
 
@@ -45,4 +44,5 @@ _(none)_
 
 | ID | Item | Date |
 |---|---|---|
+| B-031 | 🔧 Cross-platform tooling: scripts in TypeScript on Node (ADR-0011), CKTool JS instead of `xcrun cktool` and management token in `.env.local`/`.envrc` (ADR-0012). Closes B-007 (shellcheck) as obsolete. | 2026-10-26 |
 | B-000 | MVP: MV3 extension (popup, side panel bulk edit, options), CloudKit REST client, Apple sign-in, private DB Todo + Settings, schema-as-code via cktool, mise tasks, env/secret handling, ADRs 0001–0010, CI | 2026-10-25 |

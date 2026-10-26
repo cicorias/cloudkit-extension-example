@@ -24,9 +24,13 @@ Start with: `README.md` → `docs/architecture.md` → `docs/adr/README.md` → 
 | Schema validate / import / export | `mise run ck:validate` · `ck:import` · `ck:export` |
 | Extension ID + callback URL | `mise run ext:info` |
 
-Each mise task calls a script in `scripts/`. Add new automation the same way: write
-`scripts/<name>.sh` (source `scripts/lib/common.sh`), then add a `[tasks.<name>]` entry in
-`mise.toml`. Use **uv** for any Python (`uv run …`, `pyproject.toml`) and add `uv` to `[tools]`.
+Each mise task runs a TypeScript script in `scripts/` that Node 24 executes directly
+(`node scripts/<name>.ts`, no build step; ADR-0011). Add new automation the same way: write
+`scripts/<name>.ts` (import helpers from `./lib/common.ts`, which loads `.env.local` and cds to
+the repo root), then add a `[tasks.<name>]` entry with `run = "node scripts/<name>.ts"` in
+`mise.toml`. Only erasable TS syntax (no `enum`/`namespace`); `tsc -p scripts` checks it. Prefer
+`node:` built-ins over external binaries so tasks keep working on Linux, macOS and Windows.
+Use **uv** for any Python (`uv run …`, `pyproject.toml`) and add `uv` to `[tools]`.
 
 ## Layout
 
@@ -39,7 +43,8 @@ src/lib/settings.ts          synced (CloudKit) + device (chrome.storage) setting
 src/lib/quickadd.ts          "#tag !high due:YYYY-MM-DD" parser
 src/{popup,sidepanel,options}/  UI pages (plain DOM via lib/dom.ts h())
 cloudkit/schema.ckdb         CloudKit schema, the source of truth
-scripts/                     all automation; mise.toml only wires tasks
+scripts/*.ts                 all automation (Node + TS); mise.toml only wires tasks
+scripts/lib/                 shared helpers; cktool.ts wraps Apple's CKTool JS (no Xcode)
 docs/adr/                    architecture decisions
 docs/backlog.md              prioritized work items
 tests/                       vitest unit tests (Node; fetch/token store are injected)
@@ -52,7 +57,7 @@ tests/                       vitest unit tests (Node; fetch/token store are inje
   `.claude/settings.json` denies reads of them. Don't work around that.
 - Never hard-code container IDs, tokens, team IDs or extension keys in source, tests or docs.
   Use obviously fake placeholders (`iCloud.com.example.todo`, `api-token-fake`).
-- New config value? Add it to `.env.example` with a comment, to `scripts/doctor.sh`, and, only if
+- New config value? Add it to `.env.example` with a comment, to `scripts/doctor.ts`, and, only if
   the extension needs it at runtime, to `EMBEDDED_KEYS` in `vite.config.ts` and `src/lib/config.ts`.
 - `.envrc` is **not committed**. Edit `.envrc.example` instead.
 - Run `mise run secrets:scan` before proposing a commit.
@@ -81,5 +86,8 @@ tests/                       vitest unit tests (Node; fetch/token store are inje
 - A `421` means "sign in required". The client clears the token, and the UI should offer sign-in.
 - An unfiltered `records/query` needs `___recordID QUERYABLE`. Server-side sorting needs SORTABLE indexes. We sort on the client.
 - `records/modify` allows at most 200 operations. `CloudKitClient.modify` chunks.
-- `cktool` writes only to **development**. Promote in CloudKit Console.
+- The `ck:*` tasks use Apple's **CKTool JS** (`@apple/cktool.*`, CommonJS: use a default import),
+  not `xcrun cktool`, so they run on Linux. They write only to **development**. Promote in CloudKit Console.
+- The management token is `CLOUDKIT_MANAGEMENT_TOKEN` in `.env.local` or `.envrc` (ADR-0012). It is a
+  secret: never add it to `EMBEDDED_KEYS`, and never print it (use `mask()`).
 - The extension ID must be stable (manifest `key`), because the API token's Sign In Callback is `https://<id>.chromiumapp.org/`.
